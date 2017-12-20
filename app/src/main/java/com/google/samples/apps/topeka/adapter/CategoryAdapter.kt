@@ -55,10 +55,10 @@ class CategoryAdapter(
         with(holder.binding) {
             category = categories[position]
             executePendingBindings()
-            setCategoryIcon(category, categoryIcon)
+            setCategoryIcon(category!!, categoryIcon)
             with(categoryTitle) {
-                setTextColor(getColor(category.theme.textPrimaryColor))
-                setBackgroundColor(getColor(category.theme.primaryColor))
+                setTextColor(getColor(category!!.theme.textPrimaryColor))
+                setBackgroundColor(getColor(category!!.theme.primaryColor))
             }
         }
         with(holder.itemView) {
@@ -140,7 +140,7 @@ class CategoryAdapter(
 
     private fun getTintentDrawable(@DrawableRes imageRes: Int,
                                    @ColorRes tintColorRes: Int = android.R.color.white) =
-            ContextCompat.getDrawable(activity, imageRes).mutate().apply {
+            ContextCompat.getDrawable(activity, imageRes)!!.mutate().apply {
                 wrapAndTint(this, tintColorRes)
             }
 

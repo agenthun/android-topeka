@@ -48,12 +48,12 @@ import com.google.samples.apps.topeka.widget.quiz.AbsQuizView
 class QuizFragment : Fragment() {
 
     private val category by lazy(LazyThreadSafetyMode.NONE) {
-        val categoryId = arguments.getString(Category.TAG)
-        activity.database().getCategoryWith(categoryId)
+        val categoryId = arguments!!.getString(Category.TAG)
+        activity?.database()?.getCategoryWith(categoryId)
     }
 
-    private val quizAdapter by lazy(LazyThreadSafetyMode.NONE) { QuizAdapter(context, category) }
-    val scoreAdapter by lazy(LazyThreadSafetyMode.NONE) { ScoreAdapter(category, context) }
+    private val quizAdapter by lazy(LazyThreadSafetyMode.NONE) { QuizAdapter(context!!, category!!) }
+    val scoreAdapter by lazy(LazyThreadSafetyMode.NONE) { ScoreAdapter(category!!, context!!) }
 
     val quizView by lazy(LazyThreadSafetyMode.NONE) {
         view?.findViewById<AdapterViewAnimator>(R.id.quiz_view)
@@ -64,22 +64,20 @@ class QuizFragment : Fragment() {
 
     private val progressBar by lazy(LazyThreadSafetyMode.NONE) {
         (view?.findViewById<ProgressBar>(R.id.progress))?.apply {
-            max = category.quizzes.size
+            max = category!!.quizzes.size
         }
     }
     private var solvedStateListener: SolvedStateListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater?,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Create a themed Context and custom LayoutInflater
         // to get custom themed views in this Fragment.
-        val context = ContextThemeWrapper(activity, category.theme.styleId)
+        val context = ContextThemeWrapper(activity, category!!.theme.styleId)
         return context.inflate(R.layout.fragment_quiz, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setProgress(category.firstUnsolvedQuizPosition)
+        setProgress(category!!.firstUnsolvedQuizPosition)
         decideOnViewToDisplay()
         setQuizViewAnimations()
         setAvatarDrawable(view.findViewById<AvatarView>(R.id.avatar))
@@ -87,7 +85,7 @@ class QuizFragment : Fragment() {
     }
 
     private fun decideOnViewToDisplay() {
-        if (category.solved) {
+        if (category!!.solved) {
             // display the summary
             view?.let {
                 with(it.findViewById<ListView>(R.id.scorecard)) {
@@ -100,7 +98,7 @@ class QuizFragment : Fragment() {
         } else {
             with(quizView ?: return) {
                 adapter = quizAdapter
-                setSelection(category.firstUnsolvedQuizPosition)
+                setSelection(category!!.firstUnsolvedQuizPosition)
             }
         }
     }
@@ -117,7 +115,7 @@ class QuizFragment : Fragment() {
     }
 
     private fun setAvatarDrawable(avatarView: AvatarView) {
-        val player = activity.getPlayer()
+        val player = activity!!.getPlayer()
         player.valid().let {
             avatarView.setAvatar(player.avatar!!.drawableId)
             with(ViewCompat.animate(avatarView)) {
@@ -133,12 +131,12 @@ class QuizFragment : Fragment() {
     private fun setProgress(currentQuizPosition: Int) {
         if (isAdded) {
             progressText?.text = getString(R.string.quiz_of_quizzes, currentQuizPosition,
-                    category.quizzes.size)
+                    category!!.quizzes.size)
             progressBar?.progress = currentQuizPosition
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         val focusedChild = quizView?.focusedChild
         if (focusedChild is ViewGroup) {
             val currentView = focusedChild.getChildAt(0)
@@ -146,7 +144,7 @@ class QuizFragment : Fragment() {
                 outState?.putBundle(KEY_USER_INPUT, currentView.userInput)
             }
         }
-        super.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState!!)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -180,7 +178,7 @@ class QuizFragment : Fragment() {
             setProgress(nextItem)
             if (nextItem < it.adapter.count) {
                 it.showNext()
-                activity.database().updateCategory(category)
+                activity!!.database().updateCategory(category!!)
                 return true
             }
         }
@@ -189,15 +187,15 @@ class QuizFragment : Fragment() {
     }
 
     private fun markCategorySolved() {
-        category.solved = true
-        activity.database().updateCategory(category)
+        category!!.solved = true
+        activity!!.database().updateCategory(category!!)
     }
 
     fun hasSolvedStateListener() = solvedStateListener != null
 
     fun setSolvedStateListener(solvedStateListener: SolvedStateListener) {
         this.solvedStateListener = solvedStateListener
-        if (category.solved) solvedStateListener.onCategorySolved()
+        if (category!!.solved) solvedStateListener.onCategorySolved()
     }
 
     /**

@@ -77,7 +77,7 @@ class SignInFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        player = activity.getPlayer()
+        player = activity!!.getPlayer()
     }
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -86,7 +86,7 @@ class SignInFragment : Fragment() {
         val contentView = inflater.inflate(R.layout.fragment_sign_in, container, false)
         contentView.onLayoutChange {
             avatarGrid?.apply {
-                adapter = AvatarAdapter(activity)
+                adapter = AvatarAdapter(activity!!)
                 onItemClickListener = AdapterView.OnItemClickListener {
                     _, view, position, _ ->
                     selectedAvatarView = view
@@ -112,9 +112,9 @@ class SignInFragment : Fragment() {
         return (avatarGrid?.width ?: 0) / (avatarSize + avatarPadding)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         outState?.putInt(KEY_SELECTED_AVATAR_INDEX, (avatarGrid?.checkedItemPosition ?: 0))
-        super.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState!!)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -131,8 +131,8 @@ class SignInFragment : Fragment() {
             initContentViews()
             initContents()
         } else {
-            CategorySelectionActivity.start(activity, player)
-            activity.finish()
+            CategorySelectionActivity.start(activity!!, player)
+            activity!!.finish()
         }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -141,7 +141,7 @@ class SignInFragment : Fragment() {
         if (arguments == null) {
             edit = false
         } else {
-            edit = arguments.getBoolean(ARG_EDIT, false)
+            edit = arguments!!.getBoolean(ARG_EDIT, false)
         }
     }
 
@@ -169,7 +169,7 @@ class SignInFragment : Fragment() {
                 player = Player(firstName = firstNameView?.text?.toString(),
                         lastInitial = lastInitialView?.text?.toString(),
                         avatar = selectedAvatar)
-                activity.savePlayer(player)
+                activity!!.savePlayer(player)
                 removeDoneFab(Runnable {
                     performSignInWithTransition(selectedAvatarView ?:
                             avatarGrid?.getChildAt(selectedAvatar!!.ordinal))
@@ -194,22 +194,22 @@ class SignInFragment : Fragment() {
         if (v == null || ApiLevelHelper.isLowerThan(Build.VERSION_CODES.LOLLIPOP)) {
             // Don't run a transition if the passed view is null
             with(activity) {
-                CategorySelectionActivity.start(this, player)
+                CategorySelectionActivity.start(this!!, player)
                 finish()
             }
             return
         }
 
         if (ApiLevelHelper.isAtLeast(Build.VERSION_CODES.LOLLIPOP)) {
-            activity.window.sharedElementExitTransition.addListener(object :
+            activity!!.window.sharedElementExitTransition.addListener(object :
                     Transition.TransitionListener by TransitionListenerAdapter {
-                override fun onTransitionEnd(transition: Transition) = activity.finish()
+                override fun onTransitionEnd(transition: Transition) = activity!!.finish()
             })
 
-            val pairs = TransitionHelper.createSafeTransitionParticipants(activity, true,
-                    Pair(v, activity.getString(R.string.transition_avatar)))
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *pairs)
-            CategorySelectionActivity.start(activity, player, options)
+            val pairs = TransitionHelper.createSafeTransitionParticipants(activity!!, true,
+                    Pair(v, activity!!.getString(R.string.transition_avatar)))
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity!!, *pairs)
+            CategorySelectionActivity.start(activity!!, player, options)
         }
     }
 
